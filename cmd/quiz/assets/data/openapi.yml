@@ -1,0 +1,156 @@
+openapi: 3.0.1
+servers:
+  - url: 'http://localhost:8181/api/v1'
+info:
+  title: QUIZ
+  description: Server for **QUIZ**
+  version: 1.0.0
+tags:
+  - name: user
+    description: User operations
+  - name: question
+    description: Question operations
+paths:
+  '/user':
+    post:
+      tags:
+        - user
+      summary: Add user
+      operationId: addUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: User object to add
+        required: true
+      responses:
+        '201':
+          description: successful operation
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '417':
+          description: User already exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/user/:username/answer':
+    post:
+      tags:
+        - user
+        - question
+      summary: User answers the questions
+      operationId: answerQuestions
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        description: Answer list for questions
+        required: true
+      responses:
+        '202':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserScore'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '422':
+          description: Question and answer counts not equal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/question':
+    get:
+      tags:
+        - question
+      summary: Get all questions
+      operationId: getQuestions
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        '404':
+          description: No question found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        username:
+          type: string
+    Question:
+      type: object
+      properties:
+        question_text:
+          type: string
+        options:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: integer
+              - type: number
+                format: float64
+    UserScore:
+      type: object
+      properties:
+        username:
+          type: string
+        score:
+          type: integer
+        success_rate:
+          type: number
+          format: float64
+    ApiResponse:
+      type: object
+      properties:
+        data:
+          type: object
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            type:
+              type: string
+            message:
+              type: string
