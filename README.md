@@ -5,7 +5,7 @@ Server for QUIZ
 ## Build
 
     # Clone
-    git clone https://github.com/maviucak/quizApp.git
+    git clone https://github.com/cakirmuha/quizApp.git
     cd quizApp
 
     export GO111MODULE=on
